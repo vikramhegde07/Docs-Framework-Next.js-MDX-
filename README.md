@@ -11,7 +11,7 @@ Designed for developers who want **full control** without the complexity of heav
 Use the template to bootstrap a new docs app:
 
 ```bash
-npx create-next-app@latest my-docs --example "https://github.com/your-username/your-repo"
+npx create-next-app@latest my-docs --example "https://github.com/vikramhegde07/Docs-Framework-Next.js-MDX-"
 ```
 
 This gives you a fully configured documentation system out of the box.
