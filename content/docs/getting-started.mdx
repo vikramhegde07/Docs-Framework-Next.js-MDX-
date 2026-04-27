@@ -1,104 +1,211 @@
-# **Getting Started**
+# Getting Started
 
-Welcome to the **Docs Framework** built with Next.js and MDX. This framework is designed to give you **full control** over your documentation without relying on heavy abstractions.
+Welcome to the **Docs Framework** built with Next.js and MDX.
+This framework is designed to give you **full control** over your documentation without relying on heavy abstractions.
 
+---
 
-**🚀 What You Get**
+## 🚀 What You Get
 
-* File-based documentation system  
-* Automatic sidebar generation  
-* \_meta.mdx for folder control  
-* Built-in components (Callout, Tabs, etc.)  
-* Light / Dark theme support  
+* File-based documentation system
+* Automatic sidebar generation
+* `_meta.mdx` for folder control
+* Built-in components (Callout, Tabs, etc.)
+* Light / Dark theme support
 * Fully customizable UI
 
+---
 
-**📂 Project Structure**
+## 📂 Project Structure
 
-`content/docs/`  
-  `getting-started.mdx`  
-  `guides/`  
-    `_meta.mdx`  
-    `intro.mdx`
+```txt filename="content structure"
+content/docs/
+  getting-started.mdx
+  guides/
+    _meta.mdx
+    intro.mdx
+```
 
+---
 
-**⚙️ Configuration**
+## ⚙️ Configuration
 
-All behavior is controlled via /lib/config.ts:  
-`export const docsConfig = {`  
-  `home: ["getting-started"],`  
-  `docs: {`  
-    `contentDir: "content/docs",`  
-    `basePath: "/docs",`  
-  `},`  
-`}`
+All behavior is controlled via `/lib/config.ts`:
 
+```ts filename="/lib/config.ts"
+export const docsConfig = {
+  home: ["getting-started"],
+  docs: {
+    contentDir: "content/docs",
+    basePath: "/docs",
+  },
+}
+```
 
-**✍️ Writing Docs**
+---
 
-Create .mdx files inside content/docs/.  
-**Example (intro.mdx):**  
-`---`  
-`title: Introduction`  
-`order: 1`  
-`---`
+## ✍️ Writing Docs
 
-`# Introduction`  
-`Welcome to your docs!`
+Create `.mdx` files inside `content/docs/`.
 
+### Example (`intro.mdx`)
 
-**🧩 Components**
+```mdx filename="intro.mdx"
+---
+title: Introduction
+order: 1
+---
 
-### **Callout**
+# Introduction
 
-Informational and warning messages to highlight important details.
+Welcome to your docs!
+```
 
-### **Tabs**
+---
 
-Switch between different code snippets or instructions (e.g., cURL vs Node.js).
+## 🧩 Components
 
+### Callout
 
-**🔗 Links**
+<Callout type="info">
+This is an informational message.
+</Callout>
 
-Use internal links like \[Go to API\](./api/overview) or external links like \[Visit GitHub\](https://github.com).
+<Callout type="warning">
+Be careful with this step.
+</Callout>
 
+---
 
-**🧭 Navigation**
+### Tabs
 
-* Sidebar is generated automatically  
-* Breadcrumbs are handled for you  
+<Tabs>
+  <Tab title="cURL">
+
+```bash
+curl https://api.example.com/users
+```
+
+  </Tab>
+
+  <Tab title="Node.js">
+
+```ts
+fetch("https://api.example.com/users")
+```
+
+  </Tab>
+</Tabs>
+
+---
+
+## 🔗 Links
+
+* Internal: [Go to API](./api/overview)
+* External: [Visit GitHub](https://github.com)
+
+---
+
+## 🧭 Navigation
+
+* Sidebar is generated automatically
+* Breadcrumbs are handled for you
 * Previous / Next navigation is included
 
+---
 
-**🎨 Theming**
+## 🎨 Theming
 
-Includes Light mode, Dark mode, and System preference detection.
+* Light mode
+* Dark mode
+* System preference detection
 
+Use the theme toggle in the navbar.
 
-**📁 \_meta.mdx**
+---
 
-Control folder behavior and ordering:  
-`---`  
-`title: Guides`  
-`order: 2`  
-`items:`  
-  `- intro`  
-  `- setup`  
-`---`
+## 📁 `_meta.mdx`
 
+Control folder structure, ordering, and file titles.
 
-**🛠️ Customization**
+---
 
-Override components in /lib/config.ts:  
-`components: {`  
-  `Navbar: CustomNavbar,`  
-  `Footer: CustomFooter,`  
-`}`
+### Example
 
+```mdx filename="_meta.mdx"
+---
+title: Guides
+order: 2
+items:
+  intro:
+    title: Introduction
+  setup:
+    title: Setup Guide
+---
+```
 
-**📌 Next Steps**
+---
 
-* Add your own docs  
-* Customize components  
-* Style the UI  
+### What it does
+
+* Sets folder title → `Guides`
+* Controls order → `intro`, `setup`
+* Overrides file titles → cleaner sidebar labels
+
+---
+
+### Simple Ordering
+
+```mdx
+---
+items:
+  - intro
+  - setup
+---
+```
+
+---
+
+### File Title Override
+
+```mdx
+---
+items:
+  getting-started:
+    title: Getting Started
+---
+```
+
+---
+
+<Callout type="info">
+You can use `_meta.mdx` at any level, including the root `content/docs` directory.
+</Callout>
+
+---
+
+## 🛠️ Customization
+
+Override components in `/lib/config.ts`:
+
+```ts
+components: {
+  Navbar: CustomNavbar,
+  Footer: CustomFooter,
+}
+```
+
+---
+
+## 📌 Next Steps
+
+* Add your own docs
+* Customize components
+* Style the UI
 * Deploy your site
+
+---
+
+<Callout type="success">
+You're ready to build your documentation site 🚀
+</Callout>

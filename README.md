@@ -26,7 +26,7 @@ Designed for developers who want **full control** without the complexity of heav
 
 ### 1. Create a Next.js App
 
-```bash
+```bash id="z1s9qn"
 npx create-next-app@latest my-docs
 cd my-docs
 ```
@@ -35,7 +35,7 @@ cd my-docs
 
 ### 2. Install Dependencies
 
-```bash
+```bash id="t5c9nl"
 npm install @mdx-js/react @next/mdx next-mdx-remote gray-matter rehype-pretty-code remark-gfm shiki lucide-react clsx next-themes hast-util-to-string
 ```
 
@@ -45,13 +45,13 @@ npm install @mdx-js/react @next/mdx next-mdx-remote gray-matter rehype-pretty-co
 
 Configure `next.config.js`:
 
-```js
-import createMDX from '@next/mdx'
+```js id="y2s4kp"
+import createMDX from "@next/mdx"
 
 const withMDX = createMDX()
 
 export default withMDX({
-  pageExtensions: ['ts', 'tsx', 'mdx'],
+  pageExtensions: ["ts", "tsx", "mdx"],
 })
 ```
 
@@ -59,7 +59,7 @@ export default withMDX({
 
 ### 4. Add Content
 
-```
+```txt id="f0m3sd"
 content/docs/
   getting-started.mdx
   guides/
@@ -71,7 +71,7 @@ content/docs/
 
 ### 5. Run
 
-```bash
+```bash id="9p3rxt"
 npm run dev
 ```
 
@@ -79,7 +79,7 @@ npm run dev
 
 ## 📂 Project Structure
 
-```
+```txt id="m2s8rf"
 app/
   docs/
     [...slug]/page.tsx
@@ -101,7 +101,7 @@ content/
 
 All behavior is controlled via:
 
-```ts
+```ts id="v8k2qw"
 /lib/config.ts
 ```
 
@@ -109,7 +109,7 @@ All behavior is controlled via:
 
 ### Example
 
-```ts
+```ts id="x4p9zn"
 export const docsConfig = {
   home: ["getting-started"],
 
@@ -137,14 +137,27 @@ export const docsConfig = {
 
 ---
 
-## 📁 `_meta.mdx` (Folder Control)
+## 📁 `_meta.mdx` (Structure & Control)
 
-Control folder title and ordering:
+Use `_meta.mdx` to control how folders and files appear in the sidebar.
 
-```mdx
+---
+
+### 📦 Basic (Folder Title + Order)
+
+```mdx id="h3l8rf"
 ---
 title: Guides
 order: 2
+---
+```
+
+---
+
+### 🔢 Manual Ordering (Array)
+
+```mdx id="n7k1vz"
+---
 items:
   - intro
   - setup
@@ -153,11 +166,51 @@ items:
 
 ---
 
+### ✏️ Override File Titles (Object)
+
+```mdx id="b6r2pt"
+---
+items:
+  getting-started:
+    title: Getting Started
+  api:
+    title: API Reference
+---
+```
+
+---
+
+### 🔥 Full Control (Recommended)
+
+```mdx id="p9x4jw"
+---
+title: Guides
+order: 2
+items:
+  intro:
+    title: Introduction
+  setup:
+    title: Setup Guide
+---
+```
+
+---
+
+### 🧠 Notes
+
+* `items` supports both **array** and **object** formats
+* Array → controls **order only**
+* Object → controls **order + overrides (like title)**
+* Works at **any folder level**, including root (`content/docs`)
+* Unlisted items are automatically appended
+
+---
+
 ## 🧩 MDX Components
 
 Supports custom components:
 
-```mdx
+```mdx id="r3k7vc"
 <Callout type="info">
 Important note
 </Callout>
@@ -165,7 +218,7 @@ Important note
 
 Override via config:
 
-```ts
+```ts id="c5n8sy"
 components: {
   mdx: {
     h1: CustomH1
@@ -178,7 +231,7 @@ components: {
 ## 🎨 Theming
 
 * Light / Dark mode via `next-themes`
-* TailwindCSS + OKLCH color system
+* TailwindCSS + modern color system
 * Fully customizable
 
 ---
@@ -191,7 +244,7 @@ You can override:
 * Footer
 * MDX components
 
-```ts
+```ts id="d7p2mk"
 components: {
   Navbar: CustomNavbar,
   Footer: CustomFooter
@@ -215,12 +268,11 @@ components: {
 * Copy button support
 * Filename support via MDX meta
 
-````mdx
+````mdx id="k2r8qp"
 ```ts filename="example.ts"
 console.log("Hello")
-````
-
 ```
+````
 
 ---
 
@@ -228,10 +280,10 @@ console.log("Hello")
 
 This framework focuses on:
 
-- Simplicity over abstraction
-- Full control over black-box tools
-- Minimal dependencies
-- Developer-first experience
+* Simplicity over abstraction
+* Full control over black-box tools
+* Minimal dependencies
+* Developer-first experience
 
 ---
 
@@ -244,4 +296,3 @@ PRs are welcome. Feel free to open issues or suggest improvements.
 ## 📄 License
 
 MIT
-```

@@ -18,7 +18,6 @@ export const docsConfig: DocsConfig = {
         },
         links: [
             { label: "Docs", href: "/docs" },
-            { label: "API", href: "/api" },
         ],
         showThemeToggle: true,
     },
@@ -44,46 +43,36 @@ export const docsConfig: DocsConfig = {
     ========================= */
     footer: {
         brand: {
-            name: "Your Docs",
+            name: "Docs Framework",
             description:
-                "Simple documentation framework built with Next.js and MDX.",
-            logo: "/logo.png",
+                "Lightweight documentation framework built with Next.js and MDX.",
+            logo: "/logo.png", // optional
         },
 
         links: [
             {
-                title: "Docs",
+                title: "Documentation",
                 items: [
-                    { label: "Getting Started", href: "/docs/getting-started" },
-                    { label: "API", href: "/docs/api/overview" },
+                    {
+                        label: "Getting Started",
+                        href: "/docs/getting-started",
+                    },
                 ],
             },
             {
-                title: "Resources",
+                title: "Community",
                 items: [
-                    {
-                        label: "Blog",
-                        href: "https://example.com/blog",
-                        external: true,
-                    },
                     {
                         label: "GitHub",
-                        href: "https://github.com",
+                        href: "https://github.com/vikramhegde07/Docs-Framework-Next.js-MDX-",
                         external: true,
                     },
-                ],
-            },
-            {
-                title: "Legal",
-                items: [
-                    { label: "Privacy", href: "/privacy" },
-                    { label: "Terms", href: "/terms" },
                 ],
             },
         ],
 
         bottom: {
-            text: "All rights reserved.",
+            text: "© 2026 Docs Framework. All rights reserved.",
         },
     },
 
