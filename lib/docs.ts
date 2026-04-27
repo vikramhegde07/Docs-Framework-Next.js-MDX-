@@ -86,12 +86,13 @@ function getFolderMeta(dirPath: string) {
 
    → reorder children accordingly
 ========================= */
-
 function applyManualOrder(
     items: DocItem[],
-    orderList: string[] | null
+    metaItems: any
 ) {
-    if (!orderList) return items
+    if (!metaItems) return items
+
+    const isArray = Array.isArray(metaItems)
 
     const map = new Map(
         items.map((item) => [
@@ -103,19 +104,43 @@ function applyManualOrder(
     const ordered: DocItem[] = []
 
     /* =========================
-       ADD IN SPECIFIED ORDER
+       ARRAY FORMAT (OLD)
     ========================= */
 
-    for (const key of orderList) {
-        const item = map.get(key)
-        if (item) {
-            ordered.push(item)
-            map.delete(key)
+    if (isArray) {
+        for (const key of metaItems) {
+            const item = map.get(key)
+            if (item) {
+                ordered.push(item)
+                map.delete(key)
+            }
         }
     }
 
     /* =========================
-       ADD REMAINING ITEMS
+       OBJECT FORMAT (NEW)
+    ========================= */
+
+    else {
+        for (const key of Object.keys(metaItems)) {
+            const item = map.get(key)
+
+            if (item) {
+                const override = metaItems[key]
+
+                /* 🔥 APPLY TITLE OVERRIDE */
+                if (override?.title) {
+                    item.title = override.title
+                }
+
+                ordered.push(item)
+                map.delete(key)
+            }
+        }
+    }
+
+    /* =========================
+       APPEND REMAINING
     ========================= */
 
     return [...ordered, ...Array.from(map.values())]
@@ -216,12 +241,23 @@ export function getDocsTree(
     folders.sort((a, b) => a.order - b.order)
 
     /* =========================
-       FINAL MERGE
-  
-       UX decision:
-       - files first
-       - folders after
-    ========================= */
+     APPLY ROOT LEVEL META
+  ========================= */
 
-    return [...files, ...folders]
+    const currentMeta = getFolderMeta(dir)
+
+
+    let merged = [...files, ...folders]
+
+    merged = applyManualOrder(merged, currentMeta.items)
+
+    /* =========================
+      FINAL MERGE
+ 
+      UX decision:
+      - files first
+      - folders after
+   ========================= */
+
+    return merged
 }

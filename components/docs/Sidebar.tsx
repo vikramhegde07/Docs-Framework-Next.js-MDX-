@@ -172,7 +172,7 @@ function SidebarItem({
                             : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                 >
-                    <span className="truncate">{item.title}</span>
+                    <span className="truncate">{item.title || item.slug[item.slug.length - 1]}</span>
                 </Link>
             )}
         </li>
