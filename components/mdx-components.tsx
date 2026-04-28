@@ -15,6 +15,7 @@ import {
 } from "./mdx-components/Table"
 import { Callout } from "./mdx-components/Callout"
 import { Tabs, Tab } from "./mdx-components/Tabs"
+import { MDXImage, Image } from "./mdx-components/MDXImage"
 
 /* =========================
    INLINE vs BLOCK CODE
@@ -41,21 +42,33 @@ const defaultComponents = {
     h2: H2,
     h3: H3,
     h4: H4,
+
     p: P,
+
     a: MDXLink,
+
     ul: UL,
     ol: OL,
     li: LI,
+
     code: Code,
     pre: Pre,
+
     blockquote: Blockquote,
+
     table: Table,
     thead: THead,
     tbody: TBody,
     tr: TR,
     th: TH,
     td: TD,
+
+    img: MDXImage,
+
     Callout,
+
+    Image,
+
     Tabs,
     Tab,
 }

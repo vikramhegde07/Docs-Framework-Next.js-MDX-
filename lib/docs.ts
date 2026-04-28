@@ -11,6 +11,11 @@ export type DocItem = {
     title: string
     slug: string[]
     order: number
+
+    description?: string
+    keywords?: string[]
+    ogImage?: string
+
     children?: DocItem[]
 }
 
@@ -49,6 +54,10 @@ function getMeta(filePath: string) {
             data.title ||
             path.basename(filePath, ".mdx"),
 
+        description: data.description || "",
+        keywords: data.keywords || [],
+        ogImage: data.ogImage || null,
+
         order: data.order ?? 0,
     }
 }
@@ -63,6 +72,8 @@ function getFolderMeta(dirPath: string) {
     if (!fs.existsSync(metaPath)) {
         return {
             title: path.basename(dirPath),
+            description: "",
+            keywords: [],
             order: 0,
             items: null as string[] | null,
         }
@@ -73,6 +84,8 @@ function getFolderMeta(dirPath: string) {
 
     return {
         title: data.title || path.basename(dirPath),
+        description: data.description || "",
+        keywords: data.keywords || [],
         order: data.order ?? 0,
         items: data.items ?? null,
     }
@@ -203,6 +216,8 @@ export function getDocsTree(
 
             folders.push({
                 title: meta.title,
+                description: meta.description,
+                keywords: meta.keywords,
                 slug: [...parentSlug, entry.name],
                 order: meta.order,
                 children,
@@ -221,6 +236,9 @@ export function getDocsTree(
 
             files.push({
                 title: meta.title,
+                description: meta.description,
+                keywords: meta.keywords,
+                ogImage: meta.ogImage,
                 order: meta.order,
                 slug: [
                     ...parentSlug,
