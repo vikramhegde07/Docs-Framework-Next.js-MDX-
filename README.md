@@ -1,36 +1,37 @@
 # 📘 Docs Framework (Next.js + MDX)
 
-A lightweight, fully customizable documentation framework built with **Next.js App Router + MDX**.
+A lightweight, extensible documentation framework built with **Next.js App Router + MDX**.
 
-Designed for developers who want **full control** without the complexity of heavy documentation tools.
+Designed for developers who want **full control over content, structure, and UI** — without the complexity of heavy documentation tools.
 
 ---
 
 ## 🚀 Create a Project
 
-Use the template to bootstrap a new docs app:
+Bootstrap a new docs app using the template:
 
 ```bash
 npx create-next-app@latest my-docs --example "https://github.com/vikramhegde07/Docs-Framework-Next.js-MDX-"
 ```
 
-This gives you a fully configured documentation system out of the box.
+You’ll get a fully configured documentation system out of the box.
 
 ---
 
 ## ✨ Features
 
 * ⚡ Built with Next.js (App Router)
-* 📝 MDX-powered content
-* 🎨 TailwindCSS + theme system
+* 📝 MDX-powered documentation
 * 📂 File-based routing
+* 🧠 Config-driven architecture
 * 📁 `_meta.mdx` for structure control
-* 🧭 Automatic sidebar generation
-* 📑 Breadcrumb navigation
+* 🧭 Auto-generated sidebar & breadcrumbs
 * ⏮️ Previous / Next navigation
-* 📌 Table of contents (headings extraction)
-* ⚙️ Config-driven architecture
+* 📄 Folder-based navigation (explorer UI)
+* 🔌 Pluggable content sources (Local / GitHub)
+* 🎨 TailwindCSS + Theme system
 * 🧩 Fully customizable components
+* ⚡ Static export compatible
 
 ---
 
@@ -44,19 +45,20 @@ app/
 components/
   docs/
   mdx-components/
+  layout/
 
 lib/
   docs.ts
   mdx.ts
   navigation.ts
   breadcrumb.ts
+  source/
 
 content/
   docs/
+    introduction.mdx
     getting-started.mdx
-    guides/
-      _meta.mdx
-      intro.mdx
+    _meta.mdx
 ```
 
 ---
@@ -73,15 +75,29 @@ All documentation lives inside:
 content/docs/
 ```
 
-Each `.mdx` file becomes a page.
+Each `.mdx` file becomes a page automatically.
+
+---
+
+### 📁 Folder-Based Docs (New)
+
+Folders are **first-class citizens**.
+
+* If a folder has `index.mdx` → rendered as a page
+* Otherwise → rendered as a **Folder View (cards UI)**
+
+```txt
+guides/
+  intro.mdx
+  advanced/
+    auth.mdx
+```
 
 ---
 
 ### 📁 `_meta.mdx` (Structure & Control)
 
-Controls how folders and files appear in the sidebar.
-
-#### Example
+Controls sidebar structure, ordering, and labels.
 
 ```mdx
 ---
@@ -90,27 +106,65 @@ order: 2
 items:
   intro:
     title: Introduction
-  setup:
-    title: Setup Guide
+  advanced:
+    title: Advanced
 ---
 ```
 
-#### Capabilities
+#### Supports:
 
-* Set folder title
-* Control ordering
-* Override file titles
-* Works at any level (including root)
+* Title override
+* Ordering
+* Nested structure control
+* Works at any level
 
 ---
 
 ### 🧭 Navigation System
 
-Automatically generated from the file structure:
+Automatically generated from your content:
 
 * Sidebar (tree-based)
 * Breadcrumbs (context-aware)
 * Previous / Next navigation
+
+---
+
+### 🔌 Content Sources (🔥 Core Feature)
+
+Docs Framework supports multiple sources:
+
+#### 1. Local (default)
+
+```ts
+source: {
+  type: "local",
+  local: {
+    contentDir: "content/docs"
+  }
+}
+```
+
+#### 2. GitHub (remote)
+
+```ts
+source: {
+  type: "github",
+  github: {
+    owner: "your-username",
+    repo: "your-repo",
+    branch: "main",
+    docsPath: "docs",
+    token: process.env.GITHUB_TOKEN
+  }
+}
+```
+
+👉 Enables:
+
+* Remote documentation
+* Headless CMS-like behavior
+* No redeploy for content changes
 
 ---
 
@@ -126,11 +180,20 @@ All behavior is controlled via:
 
 ```ts
 export const docsConfig = {
-  home: ["getting-started"],
+  layout: {
+    navbar: true,
+    footer: true,
+  },
 
   docs: {
-    contentDir: "content/docs",
+    source: {
+      type: "local"
+    },
+
     basePath: "/docs",
+
+    home: ["introduction"],
+    defaultSlug: ["getting-started"],
 
     breadcrumb: {
       enabled: true,
@@ -154,29 +217,46 @@ export const docsConfig = {
 
 ### 🧩 MDX Components
 
-Supports custom components inside MDX:
+Use rich components inside MDX:
 
 ```mdx
 <Callout type="info">
-Important note
+This is an info message
 </Callout>
+
+<Tabs>
+  <Tab title="JavaScript">
+    console.log("Hello")
+  </Tab>
+</Tabs>
 ```
 
-Fully overrideable via config.
+Also supports:
+
+* Custom `<Image />`
+* Code blocks with filename + copy button
+* Tables, blockquotes, lists
 
 ---
 
 ### 🎨 Theming
 
-* Light / Dark mode
-* System preference support
-* TailwindCSS-based styling
+* Light / Dark / System themes
+* TailwindCSS powered
+* Fully customizable UI
 
 ---
 
-### 🔌 Extensibility
+### 🧱 Layout System
 
-Override core UI:
+Configurable layout:
+
+* Navbar
+* Sidebar
+* Topbar (breadcrumbs)
+* Footer
+
+Override easily:
 
 ```ts
 components: {
@@ -187,18 +267,53 @@ components: {
 
 ---
 
+### ⚡ Static Export
+
+Fully compatible with static export:
+
+```bash
+npm run build
+```
+
+Works with both:
+
+* Local content
+* GitHub content (with caching)
+
+---
+
+## 🧪 Example Docs Structure
+
+```txt
+content/docs/
+├── introduction.mdx
+├── getting-started.mdx
+├── guides/
+│   ├── _meta.mdx
+│   ├── intro.mdx
+│   └── advanced/
+│       └── auth.mdx
+```
+
+---
+
 ## 🛠️ Philosophy
 
 * Simplicity over abstraction
-* Full control over structure and UI
-* Minimal dependencies
+* Structure over magic
+* Config over hardcoding
 * Developer-first experience
 
 ---
 
 ## 🤝 Contributing
 
-PRs are welcome. Feel free to open issues or suggest improvements.
+PRs are welcome.
+
+If you find issues or have ideas:
+
+* Open an issue
+* Submit a pull request
 
 ---
 
