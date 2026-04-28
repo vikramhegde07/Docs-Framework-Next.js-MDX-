@@ -1,77 +1,123 @@
-import fs from "fs"
-import path from "path"
 import matter from "gray-matter"
 import { docsConfig } from "@/lib/config"
+import { getSource } from "@/lib/source"
 
-/* =========================
-   TYPES
-========================= */
+/* =========================================================
+   DOC ITEM TYPE (TREE NODE)
+
+   Represents a node in the documentation tree.
+
+   A node can be:
+   - 📄 File (leaf node)
+   - 📁 Folder (has children)
+
+   This structure is used for:
+   - Sidebar rendering
+   - Navigation (prev/next)
+   - Static route generation
+   - Folder UI rendering
+
+   NOTE:
+   - Files do NOT have `children`
+   - Folders ALWAYS have `children`
+========================================================= */
 
 export type DocItem = {
-    title: string
-    slug: string[]
-    order: number
+    title: string                // Display title
+    slug: string[]               // Route path (e.g. ["guides", "intro"])
+    order: number                // Sorting priority
 
-    description?: string
-    keywords?: string[]
-    ogImage?: string
+    description?: string         // SEO / UI description
+    keywords?: string[]          // SEO keywords
+    ogImage?: string             // Open Graph image
 
-    children?: DocItem[]
+    children?: DocItem[]         // Present only for folders
 }
 
-/* =========================
-   RESOLVE CONTENT DIRECTORY
 
-   Uses config:
-   docs.contentDir → fallback: "content/docs"
-========================= */
+/* =========================================================
+   EXTRACT FILE META
 
-function getDocsPath() {
-    const contentDir =
-        docsConfig.docs?.contentDir || "content/docs"
+   Reads an MDX file and extracts frontmatter metadata.
 
-    return path.join(process.cwd(), contentDir)
-}
+   Used for:
+   - Page titles
+   - SEO fields
+   - Ordering
 
-/* =========================
-   EXTRACT FRONTMATTER
+   Behavior:
+   - Uses `gray-matter` to parse frontmatter
+   - Falls back to filename if title is missing
+   - Returns null if file cannot be read
 
-   Reads:
-   - title
-   - order
+   IMPORTANT:
+   - Uses source adapter (local / GitHub)
+========================================================= */
 
-   Fallbacks:
-   - title → filename
-   - order → 0
-========================= */
+async function getMeta(filePath: string) {
+    const source = getSource()
 
-function getMeta(filePath: string) {
-    const source = fs.readFileSync(filePath, "utf-8")
-    const { data } = matter(source)
+    try {
+        const raw = await source.readFile(filePath)
+        const { data } = matter(raw)
 
-    return {
-        title:
-            data.title ||
-            path.basename(filePath, ".mdx"),
+        const fileName =
+            filePath.split("/").pop()?.replace(".mdx", "") || ""
 
-        description: data.description || "",
-        keywords: data.keywords || [],
-        ogImage: data.ogImage || null,
-
-        order: data.order ?? 0,
+        return {
+            title: data.title || fileName,
+            description: data.description || "",
+            keywords: data.keywords || [],
+            ogImage: data.ogImage || null,
+            order: data.order ?? 0,
+        }
+    } catch {
+        // File read failure (invalid path / API error)
+        return null
     }
 }
 
-/* =========================
+
+/* =========================================================
    READ FOLDER META (_meta.mdx)
-========================= */
 
-function getFolderMeta(dirPath: string) {
-    const metaPath = path.join(dirPath, "_meta.mdx")
+   Reads metadata for a folder from `_meta.mdx`.
 
-    if (!fs.existsSync(metaPath)) {
+   This file controls:
+   - Folder title
+   - Description
+   - Order
+   - Manual child ordering
+
+   Example `_meta.mdx`:
+   ---
+   title: Guides
+   order: 1
+   items:
+     intro:
+       title: Introduction
+   ---
+
+   Behavior:
+   - If `_meta.mdx` is missing → fallback to defaults
+   - Works at ANY folder level
+========================================================= */
+
+async function getFolderMeta(dirPath: string) {
+    const source = getSource()
+    const metaPath = `${dirPath}/_meta.mdx`
+
+    const exists = await source.exists(metaPath)
+
+    /* =========================
+       NO META FILE
+    ========================= */
+    if (!exists) {
+        const name =
+            dirPath.split("/").pop() || "root"
+
         return {
-            title: path.basename(dirPath),
+            title: name,
             description: "",
             keywords: [],
             order: 0,
@@ -79,26 +125,52 @@ function getFolderMeta(dirPath: string) {
         }
     }
 
-    const source = fs.readFileSync(metaPath, "utf-8")
-    const { data } = matter(source)
+    /* =========================
+       READ META FILE
+    ========================= */
+    const raw = await source.readFile(metaPath)
+    const { data } = matter(raw)
+
+    const name =
+        dirPath.split("/").pop() || "root"
 
     return {
-        title: data.title || path.basename(dirPath),
+        title: data.title || name,
         description: data.description || "",
         keywords: data.keywords || [],
         order: data.order ?? 0,
-        items: data.items ?? null,
+        items: data.items ?? null, // manual ordering config
     }
 }
 
-/* =========================
+
+/* =========================================================
    APPLY MANUAL ORDERING
 
-   If `_meta.mdx` has:
-   items: ["intro", "setup"]
+   Reorders items based on `_meta.mdx` configuration.
 
-   → reorder children accordingly
-========================= */
+   Supports 2 formats:
+
+   1. ARRAY (legacy):
+      items: ["intro", "setup"]
+
+   2. OBJECT (preferred):
+      items:
+        intro:
+          title: Introduction
+        setup:
+          title: Setup Guide
+
+   Features:
+   - Custom ordering
+   - Title override
+   - Description override (extended)
+
+   Behavior:
+   - Items listed first
+   - Remaining items appended automatically
+========================================================= */
+
 function applyManualOrder(
     items: DocItem[],
     metaItems: any
@@ -117,9 +189,8 @@ function applyManualOrder(
     const ordered: DocItem[] = []
 
     /* =========================
-       ARRAY FORMAT (OLD)
+       ARRAY FORMAT
     ========================= */
-
     if (isArray) {
         for (const key of metaItems) {
             const item = map.get(key)
@@ -131,9 +202,8 @@ function applyManualOrder(
     }
 
     /* =========================
-       OBJECT FORMAT (NEW)
+       OBJECT FORMAT
     ========================= */
-
     else {
         for (const key of Object.keys(metaItems)) {
             const item = map.get(key)
@@ -141,9 +211,13 @@ function applyManualOrder(
             if (item) {
                 const override = metaItems[key]
 
-                /* 🔥 APPLY TITLE OVERRIDE */
                 if (override?.title) {
                     item.title = override.title
+                }
+
+                if (override?.description) {
+                    item.description =
+                        override.description
                 }
 
                 ordered.push(item)
@@ -153,65 +227,75 @@ function applyManualOrder(
     }
 
     /* =========================
-       APPEND REMAINING
+       APPEND REMAINING ITEMS
     ========================= */
-
     return [...ordered, ...Array.from(map.values())]
 }
 
-/* =========================
-   BUILD DOCS TREE (RECURSIVE)
+
+/* =========================================================
+   BUILD DOCS TREE (ASYNC)
+
+   Recursively builds the full documentation tree.
+
+   Responsibilities:
+   - Read directory structure
+   - Identify files vs folders
+   - Extract metadata
+   - Apply ordering
+   - Build nested structure
 
    Params:
-   - dir: current directory
+   - dir: current directory path (relative)
    - parentSlug: accumulated slug path
 
    Returns:
-   - structured DocItem[]
-========================= */
+   - Nested DocItem[] tree
 
-export function getDocsTree(
-    dir: string = getDocsPath(),
+   IMPORTANT:
+   - Uses source adapter → works with local + GitHub
+   - Fully async (network-safe)
+   - Core engine powering entire docs system
+========================================================= */
+
+export async function getDocsTree(
+    dir: string = "",
     parentSlug: string[] = []
-): DocItem[] {
-    const entries = fs.readdirSync(dir, {
-        withFileTypes: true,
-    })
+): Promise<DocItem[]> {
+    const source = getSource()
+
+    const entries = await source.readDir(dir)
 
     const files: DocItem[] = []
     const folders: DocItem[] = []
 
     for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name)
+        const fullPath = entry.path
 
         /* =========================
-           HANDLE FOLDERS
+           FOLDER NODE
         ========================= */
+        if (entry.type === "dir") {
+            const meta = await getFolderMeta(fullPath)
 
-        if (entry.isDirectory()) {
+            let children = await getDocsTree(
+                fullPath,
+                [...parentSlug, entry.name]
+            )
 
-            const meta = getFolderMeta(fullPath)
+            /* Apply ordering inside folder */
+            children = applyManualOrder(
+                children,
+                meta.items
+            )
 
-            let children = getDocsTree(fullPath, [
-                ...parentSlug,
-                entry.name,
-            ])
-
-            /* =========================
-               APPLY MANUAL ORDER
-            ========================= */
-
-            children = applyManualOrder(children, meta.items)
-
-            /* =========================
-               HANDLE EMPTY FOLDERS
-            ========================= */
-
+            /* Handle empty folders */
             const showEmpty =
-                docsConfig.docs?.sidebar?.showEmptyFolders ?? false
+                docsConfig.docs.sidebar?.showEmptyFolders ??
+                false
 
             if (!children.length && !showEmpty) {
-                continue // 🚫 skip folder entirely
+                continue
             }
 
             folders.push({
@@ -225,14 +309,15 @@ export function getDocsTree(
         }
 
         /* =========================
-           HANDLE FILES (.mdx)
+           FILE NODE (.mdx)
         ========================= */
-
         else if (
             entry.name.endsWith(".mdx") &&
             entry.name !== "_meta.mdx"
         ) {
-            const meta = getMeta(fullPath)
+            const meta = await getMeta(fullPath)
+
+            if (!meta) continue
 
             files.push({
                 title: meta.title,
@@ -249,33 +334,24 @@ export function getDocsTree(
     }
 
     /* =========================
-       SORTING
-  
-       - files sorted by order
-       - folders sorted by order
+       SORT FILES & FOLDERS
     ========================= */
 
     files.sort((a, b) => a.order - b.order)
     folders.sort((a, b) => a.order - b.order)
 
     /* =========================
-     APPLY ROOT LEVEL META
-  ========================= */
+       APPLY ROOT META
+    ========================= */
 
-    const currentMeta = getFolderMeta(dir)
-
+    const currentMeta = await getFolderMeta(dir)
 
     let merged = [...files, ...folders]
 
-    merged = applyManualOrder(merged, currentMeta.items)
-
-    /* =========================
-      FINAL MERGE
- 
-      UX decision:
-      - files first
-      - folders after
-   ========================= */
+    merged = applyManualOrder(
+        merged,
+        currentMeta.items
+    )
 
     return merged
 }

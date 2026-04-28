@@ -1,5 +1,46 @@
 import clsx from "clsx"
 
+/* =========================================================
+IMAGE COMPONENTS (MDXImage & Image)
+
+This file handles all image rendering in MDX.
+
+It provides two components:
+
+1. MDXImage → automatic replacement for Markdown images
+   ![alt](src)
+
+2. Image → advanced custom component with:
+
+   * alignment
+   * caption
+   * sizing control
+
+Purpose:
+
+* Ensure consistent styling
+* Support both local and external images
+* Provide better layout control in docs
+========================================================= */
+
+/* =========================================================
+BASIC MDX IMAGE (AUTO-MAPPED)
+
+Used for standard Markdown images:
+![alt](src)
+
+Features:
+
+* Handles external and local images
+* Applies consistent styling (rounded, spacing)
+* Lightweight and simple
+
+NOTE:
+
+* Does not use next/image for simplicity
+* Can be upgraded later if needed
+========================================================= */
+
 type PropsMDXImage = {
     src?: string
     alt?: string
@@ -13,11 +54,19 @@ export function MDXImage({
     width,
     height,
 }: PropsMDXImage) {
+
     /* =========================
-       EXTERNAL IMAGE
+       CHECK IF EXTERNAL IMAGE
     ========================= */
 
     const isExternal = src.startsWith("http")
+
+    /* =========================
+       EXTERNAL IMAGE
+    
+       - Direct <img> usage
+       - No width/height enforcement
+    ========================= */
 
     if (isExternal) {
         return (
@@ -30,8 +79,12 @@ export function MDXImage({
     }
 
     /* =========================
-       LOCAL IMAGE (Next.js optimized)
+       LOCAL IMAGE
+    
+       - Applies default dimensions
+       - Ensures layout consistency
     ========================= */
+
     return (
         <img
             src={src}
@@ -41,7 +94,29 @@ export function MDXImage({
             className="rounded-lg my-4"
         />
     )
+
 }
+
+/* =========================================================
+ADVANCED IMAGE COMPONENT
+
+Used explicitly in MDX: <Image src="/img.png" align="center" caption="..." />
+
+Features:
+
+* Alignment control (left, center, right)
+* Optional caption
+* Width control
+* External + local support
+* Semantic <figure> + <figcaption>
+
+Layout:
+
+   <figure>
+     <img />
+     <figcaption />
+   </figure>
+========================================================= */
 
 type PropsImageComponent = {
     src: string
@@ -51,6 +126,7 @@ type PropsImageComponent = {
     align?: "left" | "center" | "right"
     caption?: string
 }
+
 export function Image({
     src,
     alt = "",
@@ -59,19 +135,30 @@ export function Image({
     align = "center",
     caption,
 }: PropsImageComponent) {
-    const isExternal = src.startsWith("http");
 
-    console.log(caption);
+    /* =========================
+       CHECK IF EXTERNAL IMAGE
+    ========================= */
 
+    const isExternal = src.startsWith("http")
 
     /* =========================
        ALIGNMENT STYLES
+    
+       Controls horizontal positioning
     ========================= */
+
     const alignment = {
         left: "mr-auto",
         center: "mx-auto",
         right: "ml-auto",
     }
+
+    /* =========================
+       CONTAINER STYLES
+    
+       Uses flex to align image + caption
+    ========================= */
 
     const containerClass = clsx(
         "my-6 flex flex-col",
@@ -84,9 +171,15 @@ export function Image({
 
     return (
         <figure className={containerClass}>
-            {/* =========================
-               IMAGE
-            ========================= */}
+
+            {/* =================================================
+                IMAGE ELEMENT
+
+                - Handles external and local images
+                - Applies alignment styles
+                - Supports width override
+            ================================================= */}
+
             {isExternal ? (
                 <img
                     src={src}
@@ -112,9 +205,14 @@ export function Image({
                 />
             )}
 
-            {/* =========================
-               CAPTION
-            ========================= */}
+            {/* =================================================
+                CAPTION     
+
+                - Rendered only if provided
+                - Styled as muted secondary text
+                - Centered for readability
+            ================================================= */}
+
             {caption && (
                 <figcaption className="text-sm text-muted-foreground mt-2 text-center">
                     {caption}

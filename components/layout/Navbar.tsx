@@ -8,21 +8,74 @@ import clsx from "clsx"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { docsConfig } from "@/lib/config"
 
+/* =========================================================
+NAVBAR COMPONENT
+
+Renders the top navigation bar for the docs site.
+
+Purpose:
+
+* Display brand identity (logo + name)
+* Provide primary navigation links
+* Offer quick actions (theme toggle, mobile menu)
+* Maintain consistent navigation UX across pages
+
+Features:
+
+* Sticky header with blur effect
+* Active link highlighting
+* Responsive design (desktop + mobile)
+* Config-driven (docsConfig.navbar)
+========================================================= */
+
 export function Navbar() {
+
+    /* =====================================================
+       STATE
+    
+       Controls mobile menu visibility
+    ===================================================== */
+
     const [open, setOpen] = useState(false)
+
+    /* =====================================================
+       CURRENT PATH
+    
+       Used to highlight active links
+    ===================================================== */
+
     const pathname = usePathname()
+
+    /* =====================================================
+       LOAD CONFIG
+    
+       Navbar is optional → return null if not defined
+    ===================================================== */
 
     const navbar = docsConfig.navbar
 
     if (!navbar) return null
 
-    const { brand, links = [], showThemeToggle } = navbar
+    const {
+        brand,
+        links = [],
+        showThemeToggle,
+    } = navbar
+
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl">
+
             <div className="mx-auto flex h-14 max-w-screen-2xl items-center justify-between px-6 lg:px-10">
 
-                {/* Brand */}
+                {/* =================================================
+                    BRAND SECTION       
+
+                    - Logo (optional)
+                    - Name
+                    - Links to homepage
+                ================================================= */}
+
                 <Link
                     href="/"
                     className="flex items-center gap-2.5 hover:opacity-90 transition"
@@ -34,18 +87,31 @@ export function Navbar() {
                             className="h-8 w-8 rounded-md object-contain border border-border/50"
                         />
                     )}
+
                     <span className="hidden sm:inline-block font-semibold text-foreground">
                         {brand?.name || "Docs"}
                     </span>
                 </Link>
 
-                {/* Desktop Links */}
+
+                {/* =================================================
+                    DESKTOP NAVIGATION
+
+                    - Visible on md+
+                    - Highlights active route
+                ================================================= */}
+
                 <nav className="hidden md:flex items-center gap-1">
                     {links.map((link) => {
-                        const isActive = pathname.startsWith(link.href)
+
+                        const isActive =
+                            pathname.startsWith(link.href)
 
                         return (
-                            <div key={link.href} className="relative">
+                            <div
+                                key={link.href}
+                                className="relative"
+                            >
                                 <Link
                                     href={link.href}
                                     className={clsx(
@@ -57,6 +123,12 @@ export function Navbar() {
                                 >
                                     {link.label}
                                 </Link>
+
+                                {/* =========================
+                                    ACTIVE INDICATOR
+
+                                    Animated underline
+                                ========================= */}
 
                                 <span
                                     className={clsx(
@@ -71,32 +143,63 @@ export function Navbar() {
                     })}
                 </nav>
 
-                {/* Right Actions */}
+
+                {/* =================================================
+                    RIGHT ACTIONS
+
+                    - Theme toggle (optional)
+                    - Mobile menu button
+                ================================================= */}
+
                 <div className="flex items-center gap-2">
 
-                    {showThemeToggle && <ThemeToggle />}
+                    {showThemeToggle && (
+                        <ThemeToggle />
+                    )}
+
+                    {/* =========================
+                        MOBILE MENU TOGGLE
+                    ========================= */}
 
                     <button
                         onClick={() => setOpen(!open)}
                         className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
                     >
-                        {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                        {open ? (
+                            <X className="h-5 w-5" />
+                        ) : (
+                            <Menu className="h-5 w-5" />
+                        )}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu */}
+
+            {/* =================================================
+                MOBILE MENU
+
+                - Full-screen overlay
+                - Visible only on small screens
+                - Closes on link click
+            ================================================= */}
+
             {open && (
                 <div className="fixed inset-x-0 top-14 z-50 h-screen bg-background px-6 py-8 md:hidden">
+
                     <nav className="flex flex-col gap-4">
+
                         {links.map((link) => (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                onClick={() => setOpen(false)}
+                                onClick={() =>
+                                    setOpen(false)
+                                }
                                 className={clsx(
                                     "text-lg font-semibold transition-colors",
-                                    pathname.startsWith(link.href)
+                                    pathname.startsWith(
+                                        link.href
+                                    )
                                         ? "text-primary"
                                         : "text-muted-foreground"
                                 )}
@@ -109,4 +212,5 @@ export function Navbar() {
             )}
         </header>
     )
+
 }

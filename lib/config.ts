@@ -1,52 +1,104 @@
 import type { DocsConfig } from "@/interfaces/config"
 
-export const docsConfig: DocsConfig = {
-    home: ["getting-started"],
+/* =========================================================
+   DOCS CONFIGURATION
 
+   This is the central configuration file for the docs framework.
+
+   It controls:
+   - Layout (navbar, footer)
+   - Navigation (links, branding)
+   - Theme behavior
+   - Component overrides
+   - Docs engine (routing, source, sidebar, etc.)
+
+   Think of this as:
+   → the "control panel" for the entire docs system
+========================================================= */
+
+export const docsConfig: DocsConfig = {
+
+    /* =========================================================
+       LAYOUT CONFIG
+
+       Controls visibility of global layout elements
+       across the entire application
+    ========================================================= */
     layout: {
-        navbar: true,
-        footer: true,
+        navbar: true,   // Show / hide navbar
+        footer: true,   // Show / hide footer
     },
 
-    /* =========================
-       NAVBAR
-    ========================= */
+
+    /* =========================================================
+       NAVBAR CONFIG
+
+       Controls top navigation bar
+    ========================================================= */
     navbar: {
         brand: {
-            name: "Docs Framework",
-            logo: "/logo.png",
+            name: "Docs Framework",  // Brand name text
+            logo: "/logo.png",       // Logo image path (public/)
         },
+
         links: [
-            { label: "Docs", href: "/docs" },
+            {
+                label: "Docs",
+                href: "/docs",
+            },
         ],
-        showThemeToggle: true,
+
+        showThemeToggle: true, // Light/Dark/System toggle
     },
 
-    /* =========================
+
+    /* =========================================================
        COMPONENT OVERRIDES
-    ========================= */
+
+       Allows replacing default UI components.
+
+       Use cases:
+       - Custom Navbar
+       - Custom Footer
+       - Custom MDX elements
+
+       Set to null → use built-in components
+    ========================================================= */
     components: {
-        Navbar: null,
+        Navbar: null, // Replace with custom component if needed
         Footer: null,
+
+        /**
+         * MDX component overrides
+         * Example:
+         * mdx: { h1: CustomH1 }
+         */
+        mdx: {},
     },
 
-    /* =========================
-       THEME
-    ========================= */
+
+    /* =========================================================
+       THEME CONFIG
+
+       Controls theme behavior
+    ========================================================= */
     theme: {
-        defaultTheme: "system",
-        enableSystem: true,
+        defaultTheme: "system", // "light" | "dark" | "system"
+        enableSystem: true,     // Respect OS theme
     },
 
-    /* =========================
-       FOOTER
-    ========================= */
+
+    /* =========================================================
+       FOOTER CONFIG
+
+       Controls footer layout and content
+    ========================================================= */
     footer: {
         brand: {
             name: "Docs Framework",
             description:
                 "Lightweight documentation framework built with Next.js and MDX.",
-            logo: "/logo.png", // optional
+            logo: "/logo.png",
         },
 
         links: [
@@ -65,7 +117,7 @@ export const docsConfig: DocsConfig = {
                     {
                         label: "GitHub",
                         href: "https://github.com/vikramhegde07/Docs-Framework-Next.js-MDX-",
-                        external: true,
+                        external: true, // opens in new tab
                     },
                 ],
             },
@@ -76,22 +128,144 @@ export const docsConfig: DocsConfig = {
         },
     },
 
-    /* =========================
-       DOCS ENGINE
-    ========================= */
+
+    /* =========================================================
+       DOCS ENGINE CONFIG (CORE)
+
+       This section controls how documentation content is:
+       - sourced
+       - structured
+       - routed
+       - displayed
+    ========================================================= */
     docs: {
-        contentDir: "content/docs",
+
+        /* =========================
+           CONTENT SOURCE
+
+           Defines where docs content is loaded from.
+
+           Supported:
+           - "local"  → filesystem
+           - "github" → remote repository
+
+           IMPORTANT:
+           Only one source is active at a time
+        ========================= */
+        source: {
+            type: "github", // Defaultly Using the local souce type
+
+            /* ---------- LOCAL SOURCE ---------- */
+            local: {
+                /**
+                 * Root directory for docs content
+                 * Used when type = "local"
+                 *
+                 * Example:
+                 * content/docs/
+                 */
+                contentDir: "content/docs",
+            },
+
+            /* ---------- GITHUB SOURCE ---------- */
+            github: {
+                /**
+                 * GitHub repository owner
+                 */
+                owner: process.env.GITHUB_OWNER ?? "",
+
+                /**
+                 * Repository name
+                 */
+                repo: process.env.GITHUB_REPO ?? "",
+
+                /**
+                 * Branch to fetch content from
+                 */
+                branch: "main",
+
+                /**
+                 * Path inside repo where docs live
+                 *
+                 * Example:
+                 * repo/
+                 *   └── docs/
+                 */
+                docsPath: "docs",
+
+                /**
+                 * Optional token:
+                 * - Required for private repos
+                 * - Helps avoid rate limits
+                 */
+                token: process.env.GITHUB_TOKEN,
+            },
+        },
+
+
+        /* =========================
+           ROUTING CONFIG
+        ========================= */
+
+        /**
+         * Base path for docs pages
+         *
+         * Example:
+         * /docs/getting-started
+         */
         basePath: "/docs",
+
+        /**
+         * Default fallback page
+         *
+         * Used when:
+         * - slug is empty
+         * - invalid route fallback
+         */
         defaultSlug: ["getting-started"],
 
+        /**
+         * Home entry point
+         *
+         * Used for:
+         * - landing page
+         * - redirects
+         * - navigation
+         */
+        home: ["getting-started"],
+
+
+        /* =========================
+           BREADCRUMB CONFIG
+        ========================= */
         breadcrumb: {
             enabled: true,
+
+            /**
+             * Show root label
+             * Example: "Documentation"
+             */
             showRoot: true,
+
+            /**
+             * Root label text
+             */
             rootLabel: "Documentation",
         },
 
+
+        /* =========================
+           SIDEBAR CONFIG
+        ========================= */
         sidebar: {
-            showEmptyFolders: false, // 👈 default clean behavior
+            /**
+             * Show folders even if they have no content
+             */
+            showEmptyFolders: false,
+
+            /**
+             * Label for empty folders
+             */
             emptyLabel: "No content",
         },
     },

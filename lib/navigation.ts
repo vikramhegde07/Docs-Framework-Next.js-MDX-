@@ -5,37 +5,63 @@ import type { DocItem } from "./docs"
 
    Converts nested docs tree into a linear array.
 
-   Notes:
-   - Only leaf nodes (actual pages) are included
-   - Folder nodes are skipped
-   - Order is preserved (depth-first traversal)
+   Modes:
+   1. Files only (default)
+      - Used for navigation (prev/next)
+      - Returns only leaf nodes
+
+   2. Include folders
+      - Used for static generation (SSG)
+      - Returns all nodes (folders + files)
+
+   Params:
+   - tree: Docs tree
+   - options.includeFolders: include folder nodes
 
    Example:
+
    Tree:
      Guides
        → Intro
        → Setup
-     API
-       → Users
 
-   Result:
-     [Intro, Setup, Users]
+   includeFolders = false:
+     [Intro, Setup]
+
+   includeFolders = true:
+     [Guides, Intro, Setup]
 ========================= */
 
-export function flattenDocs(tree: DocItem[]): DocItem[] {
+export function flattenDocs(
+    tree: DocItem[],
+    options?: {
+        includeFolders?: boolean
+    }
+): DocItem[] {
     const result: DocItem[] = []
+    const includeFolders = options?.includeFolders ?? false
 
     function traverse(items: DocItem[]) {
         for (const item of items) {
+            const isFolder =
+                item.children && item.children.length > 0
+
             /* =========================
-               IF FOLDER → RECURSE
+               INCLUDE FOLDER (OPTIONAL)
             ========================= */
-            if (item.children && item.children.length > 0) {
-                traverse(item.children)
+            if (isFolder && includeFolders) {
+                result.push(item)
             }
 
             /* =========================
-               IF FILE → ADD
+               RECURSE INTO CHILDREN
+            ========================= */
+            if (isFolder) {
+                traverse(item.children!)
+            }
+
+            /* =========================
+               INCLUDE FILE (LEAF NODE)
             ========================= */
             else {
                 result.push(item)
