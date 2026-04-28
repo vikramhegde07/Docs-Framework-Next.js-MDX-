@@ -84,7 +84,7 @@ export function Navbar() {
                         <img
                             src={brand.logo}
                             alt="Logo"
-                            className="h-8 w-8 rounded-md object-contain bg-foreground border border-border/50"
+                            className="h-8 w-8 rounded-md object-contain border border-border/50"
                         />
                     )}
 

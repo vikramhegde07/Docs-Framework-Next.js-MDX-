@@ -85,7 +85,7 @@ export function Footer() {
                                     <img
                                         src={footer.brand.logo}
                                         alt="Logo"
-                                        className="h-10 w-10 rounded object-contain bg-foreground"
+                                        className="h-10 w-10 rounded object-contain"
                                     />
                                 )}
 
