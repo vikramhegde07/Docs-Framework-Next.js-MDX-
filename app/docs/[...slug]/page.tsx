@@ -219,14 +219,6 @@ export default async function DocPage({
             <div className="flex-1">
 
                 {/* =========================
-                    PAGE TITLE
-                ========================= */}
-                <h1 className="text-3xl font-bold mb-6">
-                    {metadata.title}
-                </h1>
-
-
-                {/* =========================
                     MDX CONTENT
                 ========================= */}
                 <article className="prose dark:prose-invert max-w-none">

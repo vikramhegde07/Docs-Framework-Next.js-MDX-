@@ -1,211 +1,187 @@
+---
+
+title: Getting Started
+description: Learn how to set up and use the Docs Framework with local or remote content.
+keywords: [docs framework, nextjs docs, mdx docs, documentation system]
+-----------------------------------------------------------------------
+
 # Getting Started
 
-Welcome to the **Docs Framework** built with Next.js and MDX.
-This framework is designed to give you **full control** over your documentation without relying on heavy abstractions.
+Welcome to **Docs Framework** — a lightweight, flexible documentation system built with Next.js and MDX.
+
+This guide will help you get your documentation site up and running quickly.
 
 ---
 
-## 🚀 What You Get
+## 🚀 What is Docs Framework?
 
-* File-based documentation system
-* Automatic sidebar generation
-* `_meta.mdx` for folder control
-* Built-in components (Callout, Tabs, etc.)
-* Light / Dark theme support
-* Fully customizable UI
+Docs Framework is designed to:
+
+* Render **MDX-based documentation**
+* Support **local & remote content sources**
+* Provide a **clean docs UI (sidebar, breadcrumbs, navigation)**
+* Be **fully static-export compatible**
 
 ---
 
-## 📂 Project Structure
+## 📦 Project Structure
 
-```txt filename="content structure"
+By default, your docs live inside:
+
+```txt
 content/docs/
-  getting-started.mdx
-  guides/
-    _meta.mdx
-    intro.mdx
+├── _meta.mdx
+├── getting-started.mdx
+```
+
+You can organize content however you want:
+
+```txt
+content/docs/
+├── guides/
+│   ├── _meta.mdx
+│   ├── intro.mdx
+│   └── advanced/
+│       └── auth.mdx
 ```
 
 ---
 
-## ⚙️ Configuration
+## ✍️ Writing Your First Doc
 
-All behavior is controlled via `/lib/config.ts`:
+Create a new file:
 
-```ts filename="/lib/config.ts"
-export const docsConfig = {
-  home: ["getting-started"],
-  docs: {
-    contentDir: "content/docs",
-    basePath: "/docs",
-  },
-}
+```txt
+content/docs/intro.mdx
 ```
 
----
+Add content:
 
-## ✍️ Writing Docs
-
-Create `.mdx` files inside `content/docs/`.
-
-### Example (`intro.mdx`)
-
-```mdx filename="intro.mdx"
+```mdx
 ---
 title: Introduction
-order: 1
+description: Learn what this project is about
 ---
 
 # Introduction
 
-Welcome to your docs!
+Welcome to your documentation 🚀
 ```
 
 ---
 
-## 🧩 Components
+## 🧭 Navigation & Sidebar
 
-### Callout
+Docs Framework automatically:
 
-<Callout type="info">
-This is an informational message.
-</Callout>
-
-<Callout type="warning">
-Be careful with this step.
-</Callout>
+* Builds sidebar from folder structure
+* Supports ordering via `_meta.mdx`
+* Generates breadcrumbs
+* Adds previous/next navigation
 
 ---
 
-### Tabs
+## 🧠 Metadata (SEO)
 
-<Tabs>
-  <Tab title="cURL">
+Each file supports frontmatter:
 
-```bash
-curl https://api.example.com/users
+```mdx
+---
+title: My Page
+description: Page description
+keywords: [docs, mdx]
+ogImage: /og.png
+---
 ```
 
-  </Tab>
-
-  <Tab title="Node.js">
-
-```ts
-fetch("https://api.example.com/users")
-```
-
-  </Tab>
-</Tabs>
-
 ---
 
-## 🔗 Links
+## 🗂 Folder Configuration (`_meta.mdx`)
 
-* Internal: [Go to API](./api/overview)
-* External: [Visit GitHub](https://github.com)
+You can control sidebar behavior:
 
----
-
-## 🧭 Navigation
-
-* Sidebar is generated automatically
-* Breadcrumbs are handled for you
-* Previous / Next navigation is included
-
----
-
-## 🎨 Theming
-
-* Light mode
-* Dark mode
-* System preference detection
-
-Use the theme toggle in the navbar.
-
----
-
-## 📁 `_meta.mdx`
-
-Control folder structure, ordering, and file titles.
-
----
-
-### Example
-
-```mdx filename="_meta.mdx"
+```mdx
 ---
 title: Guides
 order: 2
 items:
   intro:
     title: Introduction
-  setup:
-    title: Setup Guide
+  advanced:
+    title: Advanced Guide
 ---
 ```
 
 ---
 
-### What it does
+## 🌐 Content Sources
 
-* Sets folder title → `Guides`
-* Controls order → `intro`, `setup`
-* Overrides file titles → cleaner sidebar labels
+You can switch between:
 
----
+### Local (default)
 
-### Simple Ordering
+* Reads from `content/docs`
 
-```mdx
----
-items:
-  - intro
-  - setup
----
-```
+### GitHub (remote)
 
----
+* Fetches docs from a repository
+* Enables content editing without redeploying code
 
-### File Title Override
-
-```mdx
----
-items:
-  getting-started:
-    title: Getting Started
----
-```
-
----
-
-<Callout type="info">
-You can use `_meta.mdx` at any level, including the root `content/docs` directory.
-</Callout>
-
----
-
-## 🛠️ Customization
-
-Override components in `/lib/config.ts`:
+Configured in:
 
 ```ts
-components: {
-  Navbar: CustomNavbar,
-  Footer: CustomFooter,
+docs: {
+  source: {
+    type: "local"
+  }
 }
 ```
 
 ---
 
-## 📌 Next Steps
+## ⚡ Static Export
 
-* Add your own docs
-* Customize components
-* Style the UI
-* Deploy your site
+Docs Framework supports full static export:
+
+```bash
+npm run build
+```
+
+Your site will be generated as static HTML.
 
 ---
 
-<Callout type="success">
-You're ready to build your documentation site 🚀
+## 🧩 Custom Components
+
+You can use built-in MDX components:
+
+```mdx
+<Callout type="info">
+This is an info message
 </Callout>
+
+<Tabs>
+  <Tab title="JavaScript">
+    console.log("Hello")
+  </Tab>
+</Tabs>
+```
+
+---
+
+## 🎯 Next Steps
+
+* Create new pages in `content/docs`
+* Organize folders
+* Customize `_meta.mdx`
+* Switch to GitHub source (optional)
+
+---
+
+## 💡 Tip
+
+Start simple. Build your docs structure first, then enhance with components and styling.
+
+---
+
+Happy documenting ✨

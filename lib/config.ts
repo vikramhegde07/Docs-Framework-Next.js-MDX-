@@ -153,7 +153,7 @@ export const docsConfig: DocsConfig = {
            Only one source is active at a time
         ========================= */
         source: {
-            type: "github", // Defaultly Using the local souce type
+            type: "local", // Defaultly Using the local souce type
 
             /* ---------- LOCAL SOURCE ---------- */
             local: {
@@ -232,7 +232,7 @@ export const docsConfig: DocsConfig = {
          * - redirects
          * - navigation
          */
-        home: ["getting-started"],
+        home: ["introduction"],
 
 
         /* =========================

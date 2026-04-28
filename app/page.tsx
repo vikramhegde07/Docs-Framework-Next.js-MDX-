@@ -96,13 +96,6 @@ export default async function Home() {
   return (<main className="max-w-3xl mx-auto py-10 px-4">
 
     {/* =========================
-      PAGE TITLE
-    ========================= */}
-    <h1 className="text-4xl font-bold mb-6">
-      {doc.metadata.title}
-    </h1>
-
-    {/* =========================
       MDX CONTENT
     ========================= */}
     <article className="prose dark:prose-invert max-w-none">
