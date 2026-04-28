@@ -38,7 +38,7 @@ export const docsConfig: DocsConfig = {
     navbar: {
         brand: {
             name: "Docs Framework",  // Brand name text
-            logo: "/logo.png",       // Logo image path (public/)
+            logo: "/logo.svg",       // Logo image path (public/)
         },
 
         links: [
@@ -98,7 +98,7 @@ export const docsConfig: DocsConfig = {
             name: "Docs Framework",
             description:
                 "Lightweight documentation framework built with Next.js and MDX.",
-            logo: "/logo.png",
+            logo: "/logo.svg",
         },
 
         links: [
